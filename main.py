@@ -1,56 +1,51 @@
 import logging
 
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram import BotCommand
+from telegram.ext import ApplicationBuilder, CommandHandler
 
 import config
 from bot_manager import BotManager
+from scraper import Scraper
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
-bot_manager = None
+
+async def set_commands(application):
+    """
+    Sets the bot commands for the Telegram bot.
+    """
+    commands = [
+        BotCommand("start", "Afficher le menu principal"),
+        BotCommand("demarrer", "Démarrer la vérification des RDV"),
+        BotCommand("arreter", "Arrêter la vérification des RDV"),
+        BotCommand("freq", "Définir la fréquence de vérification (en secondes)"),
+    ]
+    await application.bot.set_my_commands(commands)
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "Menu:\n"
-        "1. Démarrer la vérification des RDV : /demarrer\n"
-        "2. Arrêter la vérification des RDV : /arreter\n"
-        "3. Définir la fréquence : /frequence <seconds>\n"
+def main():
+    """
+    Main function to start the Telegram bot application.
+    """
+    application = ApplicationBuilder().token(config.TOKEN).build()
+    scraper = Scraper()
+    bot_manager = BotManager(application.job_queue, scraper)
+
+    # Add command handlers
+    application.add_handler(CommandHandler("start", bot_manager.handle_start))
+    application.add_handler(
+        CommandHandler("demarrer", bot_manager.handle_start_checking)
     )
+    application.add_handler(CommandHandler("arreter", bot_manager.handle_stop_checking))
+    application.add_handler(CommandHandler("freq", bot_manager.handle_set_frequency))
 
+    # Set up commands menu
+    application.job_queue.run_once(set_commands, 1, application)
 
-async def demarrer(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.message.chat_id
-    response = bot_manager.start_checking(chat_id)
-    await update.message.reply_text(response)
-
-
-async def arreter(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.message.chat_id
-    response = bot_manager.stop_checking(chat_id)
-    await update.message.reply_text(response)
-
-
-async def frequence(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.message.chat_id
-    try:
-        interval = int(context.args[0])
-        response = bot_manager.set_frequency(chat_id, interval)
-        await update.message.reply_text(response)
-    except (IndexError, ValueError):
-        await update.message.reply_text("Usage: /frequence <seconds>")
+    application.run_polling()
 
 
 if __name__ == "__main__":
-    application = ApplicationBuilder().token(config.TOKEN).build()
-    bot_manager = BotManager(application.job_queue)
-
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("demarrer", demarrer))
-    application.add_handler(CommandHandler("arreter", arreter))
-    application.add_handler(CommandHandler("frequence", frequence))
-
-    application.run_polling()
+    main()
