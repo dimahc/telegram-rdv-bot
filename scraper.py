@@ -1,3 +1,5 @@
+from typing import Any
+
 from bs4 import BeautifulSoup
 from pyppeteer import launch
 
@@ -47,7 +49,7 @@ class Scraper:
         """
         soup = BeautifulSoup(html_content, "html.parser")
         day_columns = soup.find_all("div", class_="day-column ng-star-inserted")
-        available_slots: list[str] = []
+        available_slots: list[Any] = []
         for day_column in day_columns:
             day_header = day_column.find_previous("div", class_="day-header")
             day_date = day_header.find("div", class_="header-date").text.strip()
@@ -55,5 +57,12 @@ class Scraper:
             for slot in slots:
                 slot_time = slot.find("span", class_="hour").text.strip()
                 slot_location = slot.find("div", class_="site-name").text.strip()
-                available_slots.append(f"{day_date} - {slot_time} à {slot_location}")
+                appointment = {
+                    "date": day_date,
+                    "time": slot_time,
+                    "location": slot_location,
+                }
+                available_slots.append(appointment)
+
+        print(available_slots)
         return available_slots

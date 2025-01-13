@@ -1,54 +1,63 @@
-# Orion RDV Bot
+# Rennes Prefecture Appointment Scraper
 
-Orion RDV Bot is a Telegram bot designed to check for available appointments on the Orion calendar of the Rennes prefecture and notify users when an appointment is found.
-
-**Warning**: Orion RDV Bot uses web scraping to retrieve appointment information from the shared calendar of the Ille-et-Vilaine prefecture. Make sure to use it responsibly and only for personal usage and avoid excessive scraping, as it may violate the terms of service of the website.
+This application scrapes appointment data for resident permit delivery from the Rennes prefecture website. The scraped data is stored in a database and can be viewed on a website or exported as a CSV file.
 
 ## Features
 
-- Scrapes the shared calendar of the Ille-et-Vilaine prefecture for available appointments
-- Notifies users via Telegram when appointments are found
-- Allows users to start and stop appointment checking
-- Allows users to set the frequency of appointment checking
-
-## Installation
-
-1. Clone the repository:
-
-```bash
-git clone git@github.com:bamanan/telegram-rdv-bot.git
-```
-
-2. Generate Bot Token
-
-Open and search on Telegram [BotFather](https://t.me/BotFather) bot and create a new Bot Token using `/newbot` command.
-Copy and paste this token in the config.py or in the `docker-compose.yaml`
+- Scrapes appointment data from the Rennes prefecture website.
+- Stores the scraped data in a SQLite database.
+- Displays the appointment data on a web interface.
+- Exports the appointment data to a CSV file.
 
 ## Configuration
 
-Before running the bot, make sure to configure the following variables in the `config.py` file:
-
-- `TOKEN`: Your Telegram bot token.
-- `URL`: The URL of the Orion shared calendar.
-- `DEFAULT_FREQUENCY`: The interval between each request to orion timetable.
+Before running the app, make sure to configure the following variables in the `config.py` file:
+- `URL`: The URL of the Rennes prefecture appointment page.
+- `DEFAULT_FREQUENCY`: The interval between each request to the appointment page.
 - `CHROMIUM_PATH`: The path to the Chromium executable or leave it empty if using the default system path.
 
-**Note**: Setting the frequency of appointment checking too high may result in excessive load on the Orion reservation system and could be considered as a cyber attack. Use reasonable intervals to avoid this.
+**Note**: Setting the frequency of appointment checking too high may result in excessive load on the Rennes prefecture website and could be considered as a cyber attack. Use reasonable intervals to avoid this.
 
-## Run
+## Run with Docker
 
-Run the bot using docker 
+Run the app using Docker:
+
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
+## Run without Docker
 
-## Usage
-Start the bot by sending /start command.
-Use the following commands to control the bot:
+1. Create a virtual environment:
 
-- `/demarrer`: Start checking for appointments.
-- `/arreter`: Stop checking for appointments.
-- `/frequence <seconds>`: Set the frequency of appointment checking (in seconds).
+```bash
+python -m venv venv
+```
 
-**Note**: Setting the frequency of appointment checking too high may result in excessive load on the Orion reservation system and could be considered as a cyber attack. Use reasonable intervals to avoid this.
+2. Activate the virtual environment:
+
+- On Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+- On macOS/Linux:
+
+```bash
+source venv/bin/activate
+```
+
+3. Install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Run the application:
+
+```bash
+python app.py
+```
+
+**Note**: Setting the frequency of appointment checking too high may result in excessive load on the Rennes prefecture website and could be considered as a cyber attack. Use reasonable intervals to avoid this.

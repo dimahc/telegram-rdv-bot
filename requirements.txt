@@ -1,4 +1,6 @@
 beautifulsoup4
 pyppeteer
-python-telegram-bot
-python-telegram-bot[job-queue]
+pandas
+numpy
+flask
+python-dotenv

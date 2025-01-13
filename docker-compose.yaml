@@ -1,9 +1,16 @@
 version: '3.8'
 
 services:
-  telegram-bot:
+  app:
     build: .
-    container_name: telegram-bot
+    container_name: rdv-app
+    ports:
+      - "5000:5000"
     environment:
-      - BOT_TOKEN=your-bot-token
-    restart: unless-stopped
+      - URL=${URL}
+      - DEFAULT_FREQUENCY=${DEFAULT_FREQUENCY}
+      - CHROMIUM_PATH=${CHROMIUM_PATH}
+    volumes:
+      - .:/app
+    command: >
+      sh -c "flask run --host=0.0.0.0 --port=5000"
